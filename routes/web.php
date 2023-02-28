@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OauthProviderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/auth/{provider}/redirect', [OauthProviderController::class, 'redirect']); 
+Route::get('/auth/{provider}/callback', [OauthProviderController::class, 'callback']); 
 
 Route::get('/dashboard', function () {
     return view('dashboard');
