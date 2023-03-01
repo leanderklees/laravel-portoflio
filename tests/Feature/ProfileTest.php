@@ -96,4 +96,51 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_user_can_delete_their_account_when_using_oauth(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Abigail',
+            'provider' => 'google',
+            'provider_id' => '123456',
+            'password' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->delete('/profile', [
+                'confirm-delete' => 'Delete:Abigail',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/');
+
+        $this->assertGuest();
+        $this->assertNull($user->fresh());
+    }
+
+    public function test_correct_double_check_must_be_provided_to_delete_account_when_using_oauth(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Abigail',
+            'provider' => 'google',
+            'provider_id' => '123456',
+            'password' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->delete('/profile', [
+                'confirm-delete' => 'Something',
+            ]);
+
+        $response
+            ->assertSessionHasErrorsIn('userDeletion', 'confirm-delete')
+            ->assertRedirect('/profile');
+
+        $this->assertNotNull($user->fresh());
+    }
 }

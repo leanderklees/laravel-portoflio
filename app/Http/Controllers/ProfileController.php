@@ -42,9 +42,24 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current-password'],
-        ]);
+        if(!Auth::User()->password){
+            // User has a Oauth Provider and therefore needs an alternative method
+            $confirmed = 'Delete:'.Auth::User()->name;
+            $request->validateWithBag('userDeletion', [
+                'confirm-delete' => [
+                    'required',
+                    function ($attribute, $value, $fail) use ($confirmed)  {
+                        if ($value !== $confirmed) {
+                            $fail(__('Please type :confirmed to delete the account', ['confirmed' => $confirmed]));
+                        }
+                    },
+                ],
+            ]);
+        } else {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current-password'],
+            ]);
+        }
 
         $user = $request->user();
 

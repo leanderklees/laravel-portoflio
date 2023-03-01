@@ -29,7 +29,6 @@ return new class extends Migration
             // Add not null constraint on provider_id if provider is given
             $table->string('provider_id')->nullable($value = true)->change();
             $table->string('provider')->nullable($value = true)->change();
-            $table->unique(['provider', 'provider_id']);
 
             // Add not null constraint on password if provider is not given
             $table->string('password')->nullable($value = true)->change();

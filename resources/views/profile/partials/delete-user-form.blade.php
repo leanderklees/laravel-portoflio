@@ -23,6 +23,7 @@
                 {{ __('Are you sure you want to delete your account?') }}
             </h2>
 
+            @if (Auth::User()->password)
             <p class="mt-1 text-sm text-gray-600">
                 {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
             </p>
@@ -40,6 +41,25 @@
 
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
+            @else
+            <p class="mt-1 text-sm text-gray-600">
+                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter:') }} <b>{{ __('Delete:') }}{{ Auth::User()->name }}</b> {{ __('to confirm you would like to permanently delete your account.') }}
+            </p>
+
+            <div class="mt-6">
+                <x-input-label for="confirm-delete" value="{{ __('Confirm delete') }}" class="sr-only" />
+
+                <x-text-input
+                    id="confirm-delete"
+                    name="confirm-delete"
+                    type="text"
+                    class="mt-1 block w-3/4"
+                    placeholder="{{ __('Delete:') }}{{ Auth::User()->name }}"
+                />
+
+                <x-input-error :messages="$errors->userDeletion->get('confirm-delete')" class="mt-2" />
+            </div>
+            @endif
 
             <div class="mt-6 flex justify-end">
                 <x-secondary-button x-on:click="$dispatch('close')">
