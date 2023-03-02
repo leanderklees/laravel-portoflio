@@ -3,7 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Providers\RouteServiceProvider;
+use App\Mail\UserProfileCreated;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -29,4 +32,28 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
+
+    public function test_new_users_get_email_notification(): void
+    {
+        Mail::fake();
+
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+
+        $user = User::where('email', 'test@example.com')->first();
+        $this->assertNotNull($user);
+
+        Mail::assertSent(UserProfileCreated::class);
+        // Mail::assertSent(UserProfileCreated::class, function ($mail) use ($user) {
+        //     $mail->build();
+        //     return $mail->hasTo($user->email);
+        // });
+    }
+
 }

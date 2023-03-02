@@ -10,9 +10,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Mail\UserProfileCreated;
+
 
 class RegisteredUserController extends Controller
 {
@@ -55,7 +58,11 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+
         Auth::login($user);
+        $test = new UserProfileCreated();
+        $authy = Auth::User();
+        Mail::to($authy)->send($test);
 
         return redirect(RouteServiceProvider::HOME);
     }
