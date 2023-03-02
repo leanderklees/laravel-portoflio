@@ -7,6 +7,7 @@ use App\Mail\UserProfileCreated;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -21,12 +22,21 @@ class RegistrationTest extends TestCase
     }
 
     public function test_new_users_can_register(): void
-    {
+    {   
+        Http::fake([
+            'www.google.com/recaptcha/api/siteverify' => Http::response([
+                'success' => true,
+                'challenge_ts' => '2023-03-01T12:34:56Z',
+                'hostname' => 'example.com',
+            ]),
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'g-recaptcha-response' => 'valid-captcha-response',
         ]);
 
         $this->assertAuthenticated();
@@ -36,12 +46,16 @@ class RegistrationTest extends TestCase
     public function test_new_users_get_email_notification(): void
     {
         Mail::fake();
+        Http::fake([
+            'www.google.com/recaptcha/api/siteverify' => Http::response(['success' => true], 200)
+        ]);
 
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'g-recaptcha-response' => 'valid-captcha-response',
         ]);
 
         $response->assertRedirect('/dashboard');
@@ -50,10 +64,6 @@ class RegistrationTest extends TestCase
         $this->assertNotNull($user);
 
         Mail::assertSent(UserProfileCreated::class);
-        // Mail::assertSent(UserProfileCreated::class, function ($mail) use ($user) {
-        //     $mail->build();
-        //     return $mail->hasTo($user->email);
-        // });
     }
 
 }
