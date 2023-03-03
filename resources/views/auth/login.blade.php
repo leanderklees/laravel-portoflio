@@ -2,7 +2,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" id="login-form">
         @csrf
 
         <!-- social login buttons -->
@@ -53,7 +53,10 @@
         @endif
 
         <div class="flex items-center justify-center mt-4">
-            <x-primary-button class="w-full flex justify-center">
+            <x-primary-button   class="w-full flex justify-center g-recaptcha"
+                                data-sitekey="{{ config('services.recaptcha.site_key') }}"
+                                data-callback='onSubmit'
+                                data-action='login' >>
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
@@ -65,4 +68,11 @@
         @endif
 
     </form>
+    @push('scripts')
+        <script>
+            function onSubmit(token) {
+                document.getElementById("login-form").submit();
+            }
+        </script>
+    @endpush
 </x-guest-layout>
