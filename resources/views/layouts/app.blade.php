@@ -32,5 +32,24 @@
                 {{ $slot }}
             </main>
         </div>
+        <div class="alertbox">
+            @if(session()->has('success'))
+                <div class="alert" role="alert">
+                    {{ session()->get('success') }}
+                </div>
+            @endif
+            @if(session()->has('status'))
+                <div class="alert" role="alert">
+                    {{ session()->get('status') }}
+                </div>
+            @endif
+            @if(session()->has('error'))
+                <div class="alert" role="alert">
+                    {{ session()->get('error') }}
+                </div>
+            @endif
+        </div>
+
+        @stack('scripts')
     </body>
 </html>
