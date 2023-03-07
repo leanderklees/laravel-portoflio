@@ -26,15 +26,21 @@ class OauthProviderController extends Controller
         try {
             $socialiteUser = Socialite::driver($provider)->user();
 
-            $user = User::updateOrCreate([
-                'email' => $socialiteUser->email,
-            ], [
-                'provider_id' => $socialiteUser->id,
-                'provider' => $provider,
-                'name' => $socialiteUser->name,
-                'provider_token' => $socialiteUser->token,
-                'email_verified_at' => now(),
-            ]);
+            $user = User::where('email', $socialiteUser->email)
+                        ->orWhere('provider_id', $socialiteUser->id)
+                        ->first();
+
+            if (!$user) {
+                // create a new user if no existing user is found
+                $user = User::create([
+                    'email' => $socialiteUser->email,
+                    'provider_id' => $socialiteUser->id,
+                    'provider' => $provider,
+                    'name' => $socialiteUser->name,
+                    'provider_token' => $socialiteUser->token,
+                    'email_verified_at' => now(),
+                ]);
+            }
 
             Auth::login($user);
 
