@@ -72,9 +72,7 @@ class RegisteredUserController extends Controller
 
 
         Auth::login($user);
-        $test = new UserProfileCreated();
-        $authy = Auth::User();
-        Mail::to($authy)->send($test);
+        Mail::to(Auth::User())->send(new UserProfileCreated());
 
         return redirect(RouteServiceProvider::HOME);
     }

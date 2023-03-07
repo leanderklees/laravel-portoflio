@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use App\Providers\RouteServiceProvider;
+use App\Mail\EmailUpdated;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -143,4 +146,35 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_email_sent_to_old_email_when_email_updated()
+    {
+        Mail::fake();
+        $user = User::factory()->create();
+
+        $oldEmail = $user->email;
+        $newEmail = 'newemail@example.com';
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => 'Test User',
+                'email' => $newEmail,
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $user->refresh();
+
+        $this->assertSame('Test User', $user->name);
+        $this->assertSame($newEmail, $user->email);
+        $this->assertNull($user->email_verified_at);
+
+        Mail::assertSent(EmailUpdated::class, function ($mail) use ($oldEmail) {
+            return $mail->hasTo($oldEmail);
+        });
+    }
+
 }

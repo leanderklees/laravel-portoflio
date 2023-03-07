@@ -6,8 +6,10 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Mail\EmailUpdated;
 
 class ProfileController extends Controller
 {
@@ -26,9 +28,10 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $oldEmail = $request->user()->email;
         $request->user()->fill($request->validated());
-
         if ($request->user()->isDirty('email')) {
+            Mail::to($oldEmail)->send(new EmailUpdated());
             $request->user()->email_verified_at = null;
         }
 
