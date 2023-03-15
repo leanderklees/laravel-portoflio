@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
@@ -47,6 +47,11 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="profile-image" :value="__('Profile Image')" />
+            <input type="file" name="profile-image" id="profile-image" credits="false" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
@@ -61,4 +66,22 @@
             @endif
         </div>
     </form>
+    @push('scripts')
+        <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+        <script>
+            const inputElement = document.querySelector('input[type="file"]');
+
+            const pond = FilePond.create(inputElement);
+
+            FilePond.setOptions({
+                server: {
+                    process: '/upload/fp-upload',
+                    revert: '/upload/fp-delete',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                },
+            });
+        </script>
+    @endpush
 </section>

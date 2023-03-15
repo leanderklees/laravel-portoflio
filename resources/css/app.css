@@ -1,4 +1,5 @@
 @import 'custom.css';
+@import url('https://unpkg.com/filepond@^4/dist/filepond.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -22,7 +22,14 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150" >
+                            <div class="profile-image-icon rounded-full w-9 h-9 mr-4 bg-slate-200 flex justify-center items-center overflow-hidden">
+                                @if (Auth::user()->profile_image)
+                                    <img class="object-cover w-9 h-9" src="{{ asset('storage/' . Auth::user()->profile_image) }}" />
+                                @else
+                                    <i class="mt-2 fa-solid fa-user text-gray-400 fa-2xl"></i>
+                                @endif
+                            </div>
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ml-1">

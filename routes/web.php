@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\OauthProviderController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/upload/fp-upload', [UploadController::class, 'fpUpload']);
+    Route::delete('/upload/fp-delete', [UploadController::class, 'fpDelete']);
 });
 
 require __DIR__.'/auth.php';
